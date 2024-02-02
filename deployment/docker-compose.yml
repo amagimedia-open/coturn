@@ -1,0 +1,64 @@
+version: "3"
+services:
+# coTURN
+  coturn:
+    image: coturn:4.2.6-r8_v0
+    container_name: coturn
+
+    privileged: true
+    restart: unless-stopped
+
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
+
+    network_mode: "host"
+
+    volumes:
+      - ./configs/turnserver.conf:/etc/turnserver.conf:ro
+
+    command: -c /etc/turnserver.conf
+# Prometheus
+  prometheus:
+    image: quay.io/prometheus/prometheus:v2.45.0
+    container_name: "prometheus"
+
+    restart: unless-stopped
+    
+    labels:
+      logging: "promtail"
+      logging_jobname: "containerlogs"
+
+    network_mode: "host"
+
+    volumes:
+      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prom_data:/prometheus
+    
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+      - '--storage.tsdb.retention.time=1d'
+# Promtail
+  promtail:
+    image: grafana/promtail:2.8.4
+    container_name: "promtail"
+  
+    restart: unless-stopped
+
+    network_mode: "host"
+    
+    tty: true
+    
+    volumes:
+      - ./configs/promtail.yaml:/etc/promtail/docker-config.yaml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    
+    command: -config.file=/etc/promtail/docker-config.yaml
+
+volumes:
+  prom_data:
