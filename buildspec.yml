@@ -8,4 +8,4 @@ phases:
   build:
     commands:
       - TAG=$(echo $CODEBUILD_WEBHOOK_TRIGGER | cut -c5- )      
-      - ${CODEBUILD_SRC_DIR}/docker/coturn/build_docker.sh ${CODEBUILD_SRC_DIR} ${CODEBUILD_WEBHOOK_TRIGGER}
+      - ${CODEBUILD_SRC_DIR}/docker/coturn/build_docker.sh ${CODEBUILD_SRC_DIR} ${TAG}
