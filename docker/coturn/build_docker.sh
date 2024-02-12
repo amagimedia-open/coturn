@@ -10,7 +10,7 @@ WORKSPACE_FOLDER=$1
 TAG=$2
 AWS_TAG=${AWS_ECR_ACCOUNT_URI}/cp/playout/coturn:${TAG}
 
-aws ecr-public get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ECR_ACCOUNT_URI}
+aws ecr-public get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin public.ecr.aws
 
 pushd ${WORKSPACE_FOLDER}
 
